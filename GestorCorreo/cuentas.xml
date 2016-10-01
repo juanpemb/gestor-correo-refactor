@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cuentas>
+<cuenta id="1" nombre="ArGoMail" usuario="juanpe@juanpemb.no-ip.org" password="292829" servs="292829" ports="25" servp="127.0.0.1" portp="110" tipo="0" />
+</cuentas>
+

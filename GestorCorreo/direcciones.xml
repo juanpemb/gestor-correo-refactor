@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<direcciones>
+<direccion id="0">Elemento de prueba</direccion>
+<direccion id="1" nombre="Juan Pedro" apellidos="Martínez" direccion="Ascension Rosell" email="juanpe1@correo.es" telefono="987654543" />
+<direccion id="2" nombre="Alberto " apellidos="Martínez" direccion="Oviedo" email="juanpe1@correo.es" telefono="987654543" />
+<direccion id="3" nombre="Marina" apellidos="Navarro" direccion="C/ Argentina nº 11. Caravaca" email="marina@navarro.es" telefono="s/n" />
+<direccion id="4" nombre="Perico " apellidos="Palotes" direccion="Su Casa" email="turru@correo.es" telefono="888888999" />
+<direccion id="5" nombre="Consuelo" apellidos="Bruno" direccion="rossell 11" email="consuelo@correo.es" telefono="9999999999" />
+<direccion id="6" nombre="juanpe" apellidos="martínez bruno" direccion="rosell nº 11" email="juanpemb@gmail.com" telefono="666666666" />
+<direccion id="7" nombre="Laura " apellidos="García-Melgares Ruíz" direccion="Almazarica nº11" email="lgmrlgmr@gmail.com" telefono="618773752" />
+</direcciones>
+

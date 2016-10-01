@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mensajes>
+<mensaje id="1" origen="JuanPe1@correo.es" destino="juanpe2@correo.es" bandeja="2" asunto="msj1" tipoMensaje="text/plain" texto="Este es el mensaje que sera guardado e el archivo mensajes.xml" fecha="1-01-2006" file="" />
+</mensajes>
+
