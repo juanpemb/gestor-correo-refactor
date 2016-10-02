@@ -6,16 +6,13 @@
  */
 package vista;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.Reader;
+import modelo.Correo;
+import modelo.GestorCorreo;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
-
-import modelo.*;
+import java.io.DataInputStream;
+import java.io.IOException;
 /**
  * @author juanpedro
  *
@@ -24,25 +21,25 @@ import modelo.*;
  */
 public class InterpreteComados {
 	
-	String nombre,usuario,contraseña,smtp,pop;
+	String nombre,usuario,password,smtp,pop;
 	Correo correo;
 	
-	public InterpreteComados(String smtp,String pop, String usuario, String contraseña){
+	public InterpreteComados(String smtp,String pop, String usuario, String password){
 		
 		this.smtp=smtp;
 		this.pop=pop;
 		this.usuario=usuario;
-		this.contraseña=contraseña;
+		this.password=password;
 		
-		correo=new GestorCorreo(smtp,pop,"",usuario,contraseña);
+		correo=new GestorCorreo(smtp,pop,"",usuario,password);
 	
 	}
 	
-	public String getContraseña() {
-		return contraseña;
+	public String getPassword() {
+		return password;
 	}
-	public void setContraseña(String contraseña) {
-		this.contraseña = contraseña;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public Correo getCorreo() {
 		return correo;
@@ -105,27 +102,27 @@ public class InterpreteComados {
 	}
 	
 	public static void main(String[] args) throws IOException, MessagingException {
-		String usuario,contraseña,smtp,pop;
+		String usuario,password,smtp,pop;
 		
 		DataInputStream dis=new DataInputStream(System.in);
 		
 		System.out.println("Bienvenido al Interprete de Comandos desarrollado" +
 				"para demostrar una de las ventajas de usar el patron MVC\n " +
-				"Ahora se va a proceder a la configuración de gestor de correo\n" +
+				"Ahora se va a proceder a la configuraciï¿½n de gestor de correo\n" +
 				"Usuario: ");
 		 
 		usuario=dis.readLine();
-		System.out.println("\ncontraseña: ");
-		contraseña=dis.readLine();
+		System.out.println("\npassword: ");
+		password=dis.readLine();
 		System.out.println("Servidor SMTP: ");
 		smtp=dis.readLine();
 		System.out.println("Servidor POP: ");
 		pop=dis.readLine();
 		
 		System.out.println("Configurando su gestor.............");
-		InterpreteComados interprete=new InterpreteComados(smtp,pop,usuario,contraseña);
+		InterpreteComados interprete=new InterpreteComados(smtp,pop,usuario,password);
 		while(true){
-			System.out.println("¿Que desea hacer leer los mensajes[l] o escribir un mensaje[e]?[l][e]");
+			System.out.println("ï¿½Que desea hacer leer los mensajes[l] o escribir un mensaje[e]?[l][e]");
 			String opcion=dis.readLine();
 			if(opcion.startsWith("l")){
 				//leemos el correo

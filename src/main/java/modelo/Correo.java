@@ -9,15 +9,16 @@
 
 package modelo;
 
-import javax.mail.*;
+import utilidades.MensajeXML;
 
-import java.util.*;
-import utilidades.*;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import java.util.Vector;
 public interface Correo
 {
 	
        
-        public Vector  abreMensajes(String s);
+    public Vector  abreMensajes(String s);
 	public void borrarMensaje(int i);
 	public void closeFolder();
 	public void closeStore();

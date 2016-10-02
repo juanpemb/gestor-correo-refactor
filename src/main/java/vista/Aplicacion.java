@@ -1,32 +1,18 @@
-/*
- * Aplicacion.java
- *
- * Created on 1 de enero de 2004, 0:10
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
- */
-
 package vista;
-import javax.swing.*;
 
+import modelo.Correo;
 import org.jdom.Element;
+import utilidades.CuentaXML;
+import utilidades.MensajeXML;
 
+import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.awt.event.*;
 import java.io.File;
-import modelo.*;
-import utilidades.*;
+import java.util.LinkedList;
+import java.util.List;
 
 
 
-/**
- *
- * @author juanpedro
- */
 public class Aplicacion extends JFrame implements Runnable{
     
 	//lista cn todos los gestores de correo (recupero XML)
@@ -56,7 +42,7 @@ public class Aplicacion extends JFrame implements Runnable{
     public Aplicacion() {
         super("GCorreo");
     	
-        //XXX Añado el gestor de correo
+        //XXX Aï¿½ado el gestor de correo
         this.gestoresCorreo=listaCuentasCorreo();
         //XXX EL gestor de correo por defecto ocupa el lugar 0 en la colleccion
         if(gestoresCorreo!=null&&gestoresCorreo.size()>0){
@@ -64,7 +50,7 @@ public class Aplicacion extends JFrame implements Runnable{
         	correo=CuentaXML.getCorreo(cuenta.getElement());
         	
         }else{
-        	System.out.println("No añadolos gestores de correo");	
+        	System.out.println("No aadolos gestores de correo");
         }
         
         
@@ -78,7 +64,7 @@ public class Aplicacion extends JFrame implements Runnable{
         
         divisor2=new JPanel();
         //divisor2.setDividerLocation(JSplitPane.HORIZONTAL_SPLIT);
-        //añado el menu
+        //aï¿½ado el menu
         //divisor2=new JPanel();
         divisor2.setLayout(new GridLayout(1,1));
         JPanel auxMenu=new JPanel();
@@ -98,8 +84,8 @@ public class Aplicacion extends JFrame implements Runnable{
         pcab.add(divisor1);
         
                 
-        //añado el divisor principal
-        arbol=new Arbol(Arbol.getDefaultNodos());
+        //aï¿½ado el divisor principal
+        arbol=new Arbol();
         JPanel panel1=new JPanel();
         String asunto[][]={{"No Leido","Compra regalos de Navidad"},{"No leido","Revisa el correo"},{"Leido","Publicidad MSN"},{"Leido","Dedicale tiempo al PFC"}};
         String estado[]={"Asunto","Estado"};
@@ -160,7 +146,7 @@ public class Aplicacion extends JFrame implements Runnable{
 	public void run(){
 		int contador=0;
 		boolean cambioCarpeta=false;
-		while(true){// TODO Auto-generated method stub
+		while(true){
 			//Inicializacion
 			if(contador==0){
 				
@@ -173,7 +159,7 @@ public class Aplicacion extends JFrame implements Runnable{
 				
 				//actualizo la carpeta
 				carpetaActual=arbol.getCarpeta();
-				//añado los mensajes del tipo reuperado(de momento los muestro todo)
+				//aï¿½ado los mensajes del tipo reuperado(de momento los muestro todo)
 				
 				divisor2.setVisible(true);
 				mensajes=MensajeXML.getList(carpetaActual);
@@ -197,7 +183,7 @@ public class Aplicacion extends JFrame implements Runnable{
 				if(mensajes.size()>0&&mensajeActual>=0&&mensajeActual<mensajes.size()){
 					mensaje=MensajeXML.getMensaje((Element)mensajes.get(mensajeActual));
 				}
-				System.out.println("Nuevo Msj nº "+mensajeActual);
+				System.out.println("Nuevo Msj nï¿½ "+mensajeActual);
 				System.out.println("Texto del mensaje\n"+mensaje.toStringHTML());
 				if(mensaje!=null){
 					//visor=new VisorHTML(mensaje.toStringHTML(),true);
@@ -211,7 +197,7 @@ public class Aplicacion extends JFrame implements Runnable{
 			try {
 				hilo.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				// do nothing
 				e.printStackTrace();
 			}
 		}

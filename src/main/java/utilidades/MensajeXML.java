@@ -9,27 +9,20 @@
  */
 
 package utilidades;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
-import java.io.File;
-import java.util.Date;
-
-import javax.mail.Message;
-
+import modelo.Correo;
 import org.jdom.Element;
-import modelo.*;
+
+import java.io.File;
+import java.util.*;
 /**
  *
  * @author juanpedro
  */
 public class MensajeXML implements ArchivoXML{
     private int id;
-    private String origen,destino, asunto, texto,tipoTexto;	//plain ó html
+    private String origen,destino, asunto, texto,tipoTexto;	//plain ï¿½ html
     private String bandeja;	//tipo carpeta a la que pertenece
-    boolean leido;			//leido ó no leido
+    boolean leido;			//leido ï¿½ no leido
     
     private String  fecha;
     private File file;

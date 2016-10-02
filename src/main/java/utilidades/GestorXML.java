@@ -9,12 +9,16 @@
  */
 
 package utilidades;
-import java.io.*;
-import java.util.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Iterator;
-import org.jdom.*;
-import org.jdom.output.*;
-import org.jdom.input.*;
+import java.util.List;
 
 /**
  *
@@ -34,7 +38,7 @@ public class GestorXML {
         try{
             Document doc=builder.build(file);    
             Element root=doc.getRootElement();
-            //elemento que devuelvo puede ser un mensaje, una cuenta de configuracion, ó una libreta de direcciones 
+            //elemento que devuelvo puede ser un mensaje, una cuenta de configuracion, ï¿½ una libreta de direcciones 
             Element resultado=null;
             List lista=root.getChildren();
             Iterator it=lista.iterator();
@@ -61,7 +65,7 @@ public class GestorXML {
                 Document doc=builder.build(file);
                 Element root=doc.getRootElement();
                 root.addContent(elemento);
-                XMLOutputter out=new XMLOutputter("", true);
+                XMLOutputter out=new XMLOutputter(Format.getPrettyFormat());
                 FileOutputStream fos=new FileOutputStream(file);
                 out.output(doc,fos);
                 fos.flush();
@@ -92,7 +96,7 @@ public class GestorXML {
                 }
                 
             }
-            XMLOutputter out=new XMLOutputter("", true);
+            XMLOutputter out=new XMLOutputter(Format.getPrettyFormat());
             FileOutputStream fos=new FileOutputStream("prueba.xml");
             out.output(doc,fos);
         }catch(Exception e){
