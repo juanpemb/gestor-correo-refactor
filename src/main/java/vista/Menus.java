@@ -50,15 +50,6 @@ public class Menus extends JMenuBar implements AnadeCorreo, ActionListener{
 		JMenu herramientasMenu=new JMenu("Herramientas");
 		JMenu ayudaMenu=new JMenu("Ayuda");
 	
-	
-	
-	
-	//aqui creare los controladores
-	
-	//
-	
-	//Creo los menuitem "Principales"
-	//arcvivo
 		for(int i=0;i<archivoItems.length; i++){
 			
 			JMenuItem item=new JMenuItem(archivoItems[i], archivoShortcuts[i]);

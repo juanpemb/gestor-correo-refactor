@@ -39,7 +39,7 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
 		this.mensajesXML=mensajesXML;
 		for(int i=0; i<nombreEtiquetas.length; i++){
 		//botones[i]=new JButton(nombreEtiquetas[i],new ImageIcon( "imagenes"+File.separator+nombreIconos[i]));
-		botones[i]=new JButton(new ImageIcon( "imagenes"+File.separator+nombreIconos[i]));
+		botones[i]=new JButton(new ImageIcon( "imagenes" +File.separator+nombreIconos[i]));
                 botones[i].addActionListener(this);
 			add(botones[i]);
 			//addSeparator();
@@ -53,12 +53,12 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
 	{
 		this.mensajesXML=mensajeXML;
 		
-		if(nombres.length!=iconos.length) System.out.println("array de diferentes tamaños\n");
+		if(nombres.length!=iconos.length) System.out.println("array de diferentes tamaï¿½os\n");
 		else
 		{
 			for (int i=0;i<nombres.length;i++)
 			{
-				botones[i]=new JButton(nombres[i],new ImageIcon( "imagenes"+File.separator+iconos[i]));
+				botones[i]=new JButton(nombres[i],new ImageIcon( "imagenes" +File.separator+iconos[i]));
 				add(botones[i]);
 			}
 		}
