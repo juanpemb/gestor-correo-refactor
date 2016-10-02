@@ -9,7 +9,6 @@
  */
 
 package utilidades;
-import java.util.List;
 import org.jdom.Element;
 /**
  *
@@ -114,15 +113,4 @@ public class DireccionXML implements ArchivoXML {
         e.setAttribute("telefono",this.telefono);
         return e;
     }
-   
-    public static void main(String args[]){
-        DireccionXML direccion =new DireccionXML("Juan Pedro",  "Martínez", "Ascension Rosell", "juanpe1@correo.es", "987654543");
-        direccion.guarda();
-        System.out.println("Echo el intento de guardar\nNumero de elementos -->"+direccion.getLastId());
-       direccion=new DireccionXML();
-       Element e=(Element)direccion.getId("2");
-       System.out.println(e.getAttributeValue("id"));
-        
-    }
-    
 }

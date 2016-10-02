@@ -9,17 +9,16 @@
  */
 
 package vista;
-import modelo.*;
-
-import javax.swing.*;
-
-import java.awt.*;
-import javax.mail.*;
-
+import modelo.Correo;
+import modelo.GestorCorreo;
 import utilidades.MensajeXML;
 import utilidades.Utilidades;
 
-import java.awt.event.*;
+import javax.mail.Message;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Date;
 
@@ -50,7 +49,6 @@ public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
 		
 		p1=new JPanel();
 		p1.setLayout(new GridLayout(1,2));
-		//añado el p2 a p1
 		p2=new JPanel();
         p2.setLayout(new GridLayout(4,2));
                 
@@ -85,7 +83,6 @@ public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
 		
 		Botones botones=new Botones(nombres, iconos,null, null);
 		
-		//no añado los s botones
 		//p1.add(botones);
 		//p1.add(p2);
 		jtbar=new JToolBar();
@@ -220,7 +217,7 @@ public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
 	}
 	public void actionPerformed(ActionEvent ae){
         	if(ae.getSource()==adj||ae.getSource()==adjuntar){
-        		System.out.println("Quiero añadir el adjunto");
+        		System.out.println("Quiero anadir el adjunto");
         		chooser.showOpenDialog(this);
         		if(chooser.getSelectedFile().getAbsolutePath()!=null)this.archivoAdjunto=chooser.getSelectedFile().getAbsolutePath();
         		System.out.println("Archivo seleccionado--<>>"+archivoAdjunto);

@@ -9,19 +9,14 @@
  */
 
 package vista;
-import java.awt.GridBagLayout;
-import javax.swing.*;
-
+import modelo.Correo;
 import org.jdom.Element;
-
 import utilidades.CuentaXML;
-import utilidades.DireccionXML;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import modelo.Correo;
 /**
  *
  * @author juanpedro
@@ -140,10 +135,8 @@ public class GestorCuentas extends JFrame implements AnadeCorreo, ActionListener
         
          pVerCuentas.add(new JLabel("<html></html>"));
         jtp.add("Ver", pVerCuentas);
-        /*añado el componente al TabbedPane*/
-        jtp.add("Guardar", pGuardarCuentas);         
-        /*añado los conmponentes al jtp y muestro el frame*/
-        getContentPane().add(jtp);   
+        jtp.add("Guardar", pGuardarCuentas);
+        getContentPane().add(jtp);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLocation(300, 150);
         pack();

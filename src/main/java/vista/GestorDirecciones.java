@@ -9,13 +9,10 @@
  */
 
 package vista;
-import javax.swing.*;
-
-import org.jdom.Element;
-
 import utilidades.CuentaXML;
 import utilidades.DireccionXML;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -153,7 +150,6 @@ public class GestorDirecciones extends JFrame implements ActionListener{
         this.guardarDir.add(pgd6);
         
         
-        /*añado paneles al jtabbedpane*/
         jtp.add("Ver", this.verDir);
         jtp.add("Guardar", this.guardarDir);
         getContentPane().add(jtp);
@@ -195,7 +191,7 @@ public class GestorDirecciones extends JFrame implements ActionListener{
     public void guardar(){
     	DireccionXML direccion=new DireccionXML(this.tgdnombre.getText(),this.tgdapellidos.getText(),this.tgddireccion.getText(),this.tgdemail.getText(),this.tgdtelefono.getText());
     	direccion.guarda();
-    	System.out.println("¿¿Guarda??");
+    	System.out.println("Guarda??");
     }
     
     public void mostrar(int id){
