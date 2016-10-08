@@ -7,23 +7,14 @@
 package vista;
 
 
-import java.awt.event.*;
+import org.jdom.Element;
+import utilidades.MensajeXML;
+
+import javax.swing.*;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-
-import org.jdom.Element;
-
-import utilidades.MensajeXML;
+import java.util.*;
 
 /**
  * @author juanpedro
@@ -47,7 +38,9 @@ public class Combo extends JList implements MouseListener{
 		Object [] resultado;
 		DateFormat df=DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.getDefault());
 		LinkedList lista=new LinkedList();
-		
+		if(mensajes==null){
+			return Collections.EMPTY_LIST.toArray();
+		}
 		Iterator it=mensajes.iterator();
 		while(it.hasNext()){
 			MensajeXML msj=MensajeXML.getMensaje((Element)it.next());

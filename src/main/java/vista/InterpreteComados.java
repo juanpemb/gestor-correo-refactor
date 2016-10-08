@@ -8,6 +8,7 @@ package vista;
 
 import modelo.Correo;
 import modelo.GestorCorreo;
+import modelo.MailServerSession;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,58 +22,15 @@ import java.io.IOException;
  */
 public class InterpreteComados {
 	
-	String nombre,usuario,password,smtp,pop;
 	Correo correo;
 	
 	public InterpreteComados(String smtp,String pop, String usuario, String password){
-		
-		this.smtp=smtp;
-		this.pop=pop;
-		this.usuario=usuario;
-		this.password=password;
-		
-		correo=new GestorCorreo(smtp,pop,"",usuario,password);
+		MailServerSession mss = new MailServerSession(smtp,null,pop,null,usuario,usuario,password);
+		correo=new GestorCorreo(mss);
 	
 	}
 	
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public Correo getCorreo() {
-		return correo;
-	}
-	public void setCorreo(Correo correo) {
-		this.correo = correo;
-	}
-	public String getNombre() {
-		return nombre;
-	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	public String getPop() {
-		return pop;
-	}
-	public void setPop(String pop) {
-		this.pop = pop;
-	}
-	public String getSmtp() {
-		return smtp;
-	}
-	public void setSmtp(String smtp) {
-		this.smtp = smtp;
-	}
-	public String getUsuario() {
-		return usuario;
-	}
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
-	}
-	//##################################################
-	//metodos de fincionalidad
+
 	public String leer() throws MessagingException{
 	
 		String resultado="";
@@ -139,7 +97,6 @@ public class InterpreteComados {
 				System.out.println("Mensaje:");
 				texto=dis.readLine();
 				interprete.enviar(from,asunto,texto);
-				
 			}
 		}
 		

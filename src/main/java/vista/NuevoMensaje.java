@@ -11,6 +11,7 @@
 package vista;
 import modelo.Correo;
 import modelo.GestorCorreo;
+import modelo.MailServerSession;
 import utilidades.MensajeXML;
 import utilidades.Utilidades;
 
@@ -238,7 +239,8 @@ public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
 	{
 		System.out.println("antes de llamar construir el nuevo mensaje");
 		NuevoMensaje nm=new NuevoMensaje("Titulo(Prueba)");
-		GestorCorreo gc=new GestorCorreo("127.0.0.1","127.0.0.1","juanpe1..localhost","juanpe1..localhost","111");
+		MailServerSession mailServiceSession = new MailServerSession("127.0.0.1",null,"127.0.0.1",null,"juanpe1..localhost","juanpe1..localhost","111");
+		GestorCorreo gc=new GestorCorreo(mailServiceSession);
 		gc.initStore();
 		gc.initFolder();
 		nm.addCorreo(gc);

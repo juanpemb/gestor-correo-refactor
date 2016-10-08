@@ -9,12 +9,14 @@
  */
 
 package utilidades;
-import java.io.File;
+import modelo.Correo;
+import modelo.GestorCorreo;
+import modelo.MailServerSession;
+import org.jdom.Element;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.jdom.Element;
-import modelo.*;
 /**
  *
  * @author juanpedro
@@ -153,10 +155,9 @@ public class CuentaXML implements ArchivoXML{
     	int tipo=Integer.parseInt(tipoa);
     	
     	
-    	GestorCorreo gc=new GestorCorreo(servS,ports,servP,portP,"",usuario,password);
+    	GestorCorreo gc=new GestorCorreo(new MailServerSession(servS, ports, servP, portP, "", usuario, password));
     	if(gc!=null){
     		System.out.println("El gestor de correo NO es nulo");
-    		System.out.println(gc.getDe("")+" "+gc.getHost(""));
     	}
     	else System.out.println("El gestor de correo Es nulo");
     	return (Correo)gc;
@@ -178,10 +179,12 @@ public class CuentaXML implements ArchivoXML{
     	return new CuentaXML( nombre, usuario,  password, servS, ports,  servP, portP,tipo);    
     } 
     public static List getCuentasXML(){
-    	
-    	CuentaXML cuenta=new CuentaXML();
-    	List lista=cuenta.getLista();
-    	List resultado=(List)new LinkedList();
+		List resultado=(List)new LinkedList();
+		CuentaXML cuenta=new CuentaXML();
+		if(cuenta==null || cuenta.getLista()==null){
+			return resultado;
+		}
+		List lista=cuenta.getLista();
     	Iterator it=lista.iterator();
     	
     	while(it.hasNext()){
