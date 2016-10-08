@@ -13,11 +13,10 @@ import utilidades.MensajeXML;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import java.util.Vector;
 public interface Correo
 {
-	
-       
     public Vector  abreMensajes(String s);
 	public void borrarMensaje(int i);
 	public void closeFolder();
@@ -35,10 +34,8 @@ public interface Correo
 	public void mandaMensaje(Message m);	
 	public void mandaMensajeSSL(Message m);
 	public void recogeArchivo(Message m);
-	public void reenviarMensaje(Message m, String s);
-	public void responderMensaje(Message m, String s, String st);
-	
-	public void mandaMensaje(MensajeXML m);
+	public void setSession(Session session);
+
 	public MensajeXML toMensajeXML(Message m) throws MessagingException;
 
 }

@@ -7,8 +7,8 @@
 package vista;
 
 import modelo.Correo;
-import modelo.GestorCorreo;
-import modelo.MailServerSession;
+import modelo.impl.GestorCorreo;
+import modelo.impl.MailServerArgs;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -25,7 +25,7 @@ public class InterpreteComados {
 	Correo correo;
 	
 	public InterpreteComados(String smtp,String pop, String usuario, String password){
-		MailServerSession mss = new MailServerSession(smtp,null,pop,null,usuario,usuario,password);
+		MailServerArgs mss = new MailServerArgs(smtp,null,pop,null,usuario,usuario,password);
 		correo=new GestorCorreo(mss);
 	
 	}

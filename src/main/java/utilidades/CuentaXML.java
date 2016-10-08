@@ -10,8 +10,8 @@
 
 package utilidades;
 import modelo.Correo;
-import modelo.GestorCorreo;
-import modelo.MailServerSession;
+import modelo.impl.GestorCorreo;
+import modelo.impl.MailServerArgs;
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -155,7 +155,7 @@ public class CuentaXML implements ArchivoXML{
     	int tipo=Integer.parseInt(tipoa);
     	
     	
-    	GestorCorreo gc=new GestorCorreo(new MailServerSession(servS, ports, servP, portP, "", usuario, password));
+    	GestorCorreo gc=new GestorCorreo(new MailServerArgs(servS, ports, servP, portP, "", usuario, password));
     	if(gc!=null){
     		System.out.println("El gestor de correo NO es nulo");
     	}

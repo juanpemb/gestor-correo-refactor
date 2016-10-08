@@ -1,6 +1,7 @@
-package modelo;
+package modelo.impl;
 
 import com.sun.mail.smtp.SMTPSSLTransport;
+import modelo.Correo;
 import utilidades.MensajeXML;
 
 import javax.activation.DataHandler;
@@ -19,20 +20,20 @@ import java.util.Vector;
 
 public class GestorCorreo implements Correo {
 
-    private MailServerSession mailServerSession;
+    private MailServerArgs mailServerArgs;
     private Session sesion;
     private Store store;
     private Folder folder;
 
-    public GestorCorreo(MailServerSession mailServerSession) {
-        this.mailServerSession = mailServerSession;
+    public GestorCorreo(MailServerArgs mailServerArgs) {
+        this.mailServerArgs = mailServerArgs;
     }
 
     public Session getSesion() {
         return sesion;
     }
 
-    public void setSesion(Session sesion) {
+    public void setSession(Session sesion) {
         this.sesion = sesion;
     }
 
@@ -47,12 +48,12 @@ public class GestorCorreo implements Correo {
 
     public void initStore() {
         Properties p = System.getProperties();
-        p.put("mail.smtp.host", mailServerSession.getH());
+        p.put("mail.smtp.host", mailServerArgs.getHost());
         p.put("mail.smtp.auth", "true");
         sesion = Session.getDefaultInstance(p, null);
         try {
             store = sesion.getStore("pop3");
-            store.connect(mailServerSession.getHe(), mailServerSession.getUsuario(), mailServerSession.getPwd());
+            store.connect(mailServerArgs.getHe(), mailServerArgs.getUsuario(), mailServerArgs.getPwd());
         } catch (javax.mail.MessagingException e) {
             e.printStackTrace();
         }
@@ -148,7 +149,7 @@ public class GestorCorreo implements Correo {
     public Message creaMensajeHTML(String to, String asunto, String texto) {
         MimeMessage m = new MimeMessage(sesion);
         try {
-            m.setFrom(new InternetAddress(mailServerSession.getD()));
+            m.setFrom(new InternetAddress(mailServerArgs.getDe()));
             m.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             m.setSubject(asunto);
             BodyPart bp = new MimeBodyPart();
@@ -167,42 +168,32 @@ public class GestorCorreo implements Correo {
     }
 
 
-    public void mandaMensaje(Message m)   //manda un mensaje
+    public void mandaMensaje(Message m)
     {
+        if (m == null)
+            throw new RuntimeException("Mensaje no valido" + m.toString());
+
         try {
-            Transport t = sesion.getTransport("smtp");
-            t.connect(
-                    mailServerSession.getH(),
-                    mailServerSession.getUsuario(),
-                    mailServerSession.getPwd()
-            );//conecta con el servidor smtp
-            if (m == null) System.out.println("El mensaje es nulo");
-            t.sendMessage(m, m.getAllRecipients());
-            t.close();
+            Transport transport = sesion.getTransport("smtp");
+            transport.connect(
+                    mailServerArgs.getHost(),
+                    Integer.parseInt(mailServerArgs.getPuertoSMTP()),
+                    mailServerArgs.getUsuario(),
+                    mailServerArgs.getPwd());
+            transport.sendMessage(m, m.getAllRecipients());
+            transport.close();
 
         } catch (javax.mail.MessagingException e) {
-
-            System.err.println("Error en mandaMensaje");
-            e.printStackTrace();
+            throw new RuntimeException("Error en el envio del mensaje " + m.toString() ,e);
         }
-
-    }
-
-    public void mandaMensaje(MensajeXML msjXML) {
-        Message message = creaMensaje(msjXML.getDestino(), msjXML.getAsunto(), msjXML.getTexto());
-        if (msjXML.getFile() != null) {
-            message = this.incluirArchivo(message, msjXML.getFile().getAbsolutePath());
-        }
-        mandaMensaje(message);
-        System.out.println("El mensajeXML fue enviado");
     }
 
     public void mandaMensajeSSL(Message m) {
         try {
-            SMTPSSLTransport t = new SMTPSSLTransport(sesion, new URLName(mailServerSession.getH()));
-            t.connect(mailServerSession.getH(),
-                    mailServerSession.getUsuario(),
-                    mailServerSession.getPwd()
+            SMTPSSLTransport t = new SMTPSSLTransport(sesion, new URLName(mailServerArgs.getHost()));
+            t.connect(mailServerArgs.getHost(),
+                    mailServerArgs.getUsuario(),
+                    mailServerArgs.getPwd()
             );
 
             t.sendMessage(m, m.getAllRecipients());
@@ -215,7 +206,7 @@ public class GestorCorreo implements Correo {
 
     public Message[] leeCorreos() {
         Properties p = System.getProperties();
-        p.put("mail.smtp.host", mailServerSession.getH());
+        p.put("mail.smtp.host", mailServerArgs.getHost());
         Session sesion = Session.getDefaultInstance(p, null);
         try {
 
@@ -460,9 +451,9 @@ public class GestorCorreo implements Correo {
             respuesta.setText(texto);
             Transport t = sesion.getTransport("smtp");
             t.connect(
-                    mailServerSession.getH(),
-                    mailServerSession.getUsuario(),
-                    mailServerSession.getPwd()
+                    mailServerArgs.getHost(),
+                    mailServerArgs.getUsuario(),
+                    mailServerArgs.getPwd()
             );//conecta con el servidor smtp
             t.sendMessage(m, m.getAllRecipients());
             t.close();
@@ -480,7 +471,7 @@ public class GestorCorreo implements Correo {
             MimeMessage enviar = new MimeMessage(sesion);
 
             enviar.setSubject("Fwd: " + m.getSubject());
-            enviar.setFrom(new InternetAddress(mailServerSession.getD()));
+            enviar.setFrom(new InternetAddress(mailServerArgs.getDe()));
             enviar.addRecipient(Message.RecipientType.TO, new InternetAddress(para));
 
             BodyPart mbp = new MimeBodyPart();
@@ -498,9 +489,9 @@ public class GestorCorreo implements Correo {
             enviar.setContent(mp);
 
             Transport t = sesion.getTransport("smtp");
-            t.connect(mailServerSession.getH(),
-                    mailServerSession.getUsuario(),
-                    mailServerSession.getPwd()
+            t.connect(mailServerArgs.getHost(),
+                    mailServerArgs.getUsuario(),
+                    mailServerArgs.getPwd()
             );//conecta con el servidor smtp
             t.sendMessage(enviar, enviar.getAllRecipients());
             t.close();
@@ -588,7 +579,7 @@ public class GestorCorreo implements Correo {
         System.out.println("Prueba de gestion de correo\n");
         //	GestionCorreo gc=new GestionCorreo("mailhost.terra.es","pop3.terra.es","chiclemb@terra.es","chiclemb.terra.es","292829");
         //GestorCorreo gc = new GestorCorreo("127.0.0.1", "127.0.0.1", "juanpe1..localhost", "juanpe1..localhost", "111");
-        MailServerSession session = new MailServerSession("127.0.0.1",null, "127.0.0.1", null, "juanpe1..localhost", "juanpe1..localhost", "111");
+        MailServerArgs session = new MailServerArgs("127.0.0.1",null, "127.0.0.1", null, "juanpe1..localhost", "juanpe1..localhost", "111");
         GestorCorreo gc = new GestorCorreo(session);
 
         gc.initStore();
