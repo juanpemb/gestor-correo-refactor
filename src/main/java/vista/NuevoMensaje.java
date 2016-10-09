@@ -1,17 +1,8 @@
-/*
- * NuevoMensaje.java
- *
- * Created on 1 de diciembre de 2005, 6:21
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
- */
-
 package vista;
 import modelo.Correo;
 import modelo.impl.GestorCorreo;
 import modelo.impl.MailServerArgs;
+import modelo.impl.MessageHandler;
 import utilidades.MensajeXML;
 import utilidades.Utilidades;
 
@@ -24,7 +15,7 @@ import java.io.File;
 import java.util.Date;
 
 public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
-{
+{	private MessageHandler handler = new MessageHandler();
 	private Message m;
 	private String archivoAdjunto;
 	private MensajeXML mensaje;
@@ -130,13 +121,9 @@ public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
 			m=correo.creaMensaje(this.tpara.getText(),this.tasunto.getText(),this.texto.getText());
 			
 			if(this.archivoAdjunto!=null&&archivoAdjunto.length()>0){
-				m=correo.incluirArchivo(m,archivoAdjunto);
+				m=handler.incluirArchivo(m,archivoAdjunto);
 			}
-			
-			//correo.initStore();
-			//correo.initFolder();
-			correo.initStore();
-			correo.initFolder();
+
 			correo.mandaMensaje(m);
 			System.out.println("Envio el mensajeaSw	qw	qwq");
 			//guarda mensaje en la carperta de salida
@@ -241,15 +228,6 @@ public class NuevoMensaje extends JFrame implements  AnadeCorreo,ActionListener
 		NuevoMensaje nm=new NuevoMensaje("Titulo(Prueba)");
 		MailServerArgs mailServiceSession = new MailServerArgs("127.0.0.1",null,"127.0.0.1",null,"juanpe1..localhost","juanpe1..localhost","111");
 		GestorCorreo gc=new GestorCorreo(mailServiceSession);
-		gc.initStore();
-		gc.initFolder();
 		nm.addCorreo(gc);
-		//Thread.sleep(20000);
-		//nm.enviarMensaje();
-		
-		System.out.println("Envia mensaje\n");
 	}
 }
-	
-
-

@@ -1,31 +1,20 @@
-/*
- * Botones.java
- *
- * Created on 1 de diciembre de 2005, 5:47
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
- */
-
 package vista;
-//**********************************************
-//Esta clase es un panel con la barra de botones
-//**********************************************
+
 import modelo.Correo;
-import java.awt.*;
-import java.awt.event.*;
+import modelo.impl.MessageHandler;
+import utilidades.AnadeMensaje;
+import utilidades.MensajeXML;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.swing.*;
-import java.io.*;
-
-import utilidades.AnadeMensaje;
-import utilidades.MensajeXML;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 
 public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, ActionListener{
-
+	private MessageHandler handler = new MessageHandler();
 
 	private String [] nombreEtiquetas=new String[]{"Recibir mensajes","Redactar","Libreta de Direcciones", "Responder", "Responder a todos", "Reenviar", "Borrar", "Imprimir"};
 	private String [] nombreIconos=new String[]{"RECIBIR.GIF", "ENVIAR.GIF","DIRECCIONES.GIF","RESPONDER.GIF","RESPONDER.GIF","REENVIAR.GIF","BORRAR.GIF","IMPRIMIR.GIF"};
@@ -38,14 +27,10 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
 		setFloatable(true);
 		this.mensajesXML=mensajesXML;
 		for(int i=0; i<nombreEtiquetas.length; i++){
-		//botones[i]=new JButton(nombreEtiquetas[i],new ImageIcon( "imagenes"+File.separator+nombreIconos[i]));
 		botones[i]=new JButton(new ImageIcon( "imagenes" +File.separator+nombreIconos[i]));
                 botones[i].addActionListener(this);
 			add(botones[i]);
-			//addSeparator();
-                        
-		
-		}		
+		}
 		c=correo;
 	}
 	
@@ -79,8 +64,8 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
             this.mensaje=mensaje;
         }
         public MensajeXML getMensaje(){return mensaje; }
-        
-	
+
+
 	public void actionPerformed(ActionEvent a) {
             if(a.getSource()==this.botones[0]){
                 try {
@@ -90,8 +75,8 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
 					// TODO Auto-generated catch block
 					System.out.println("Error al leer correo desde Botones"+e.getMessage());
 					e.printStackTrace();
-				}	
-            	
+				}
+
             	System.out.println("recibir mensajes");
             }else if(a.getSource()==this.botones[1]){
                 //redactar nuevo mensaje
@@ -99,8 +84,8 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
             	System.out.println("Botones: ActionPerformed");
             	if(c==null)System.out.println("Botones: ActionPerformed: el gestor Es Nulo");
             	nuevoMensaje.setCorreo(c);
-            	
-            	
+
+
             }else if(a.getSource()==botones[2]){
                 //Direcciones
             	new GestorDirecciones("Libreta de direcciones");
@@ -108,7 +93,7 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
                 //responder se le debe pasar un mensaje para poder responderlo
             	NuevoMensaje nuevoMensaje=new NuevoMensaje("Responder Mensaje");
             	nuevoMensaje.addCorreo(c);
-            	
+
             }else if(a.getSource()==botones[4]){
                 //omo el de arriba
             	NuevoMensaje nuevoMensaje=new NuevoMensaje("Responder a Todos");
@@ -124,29 +109,16 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
                 //imprimir
             	System.out.println("Imprimir mensaje");
             }
-            
+
         }
-		
-	/**
-	 * @throws MessagingException
-	 * 
-	 */
+
 	private void leerCorreos() throws MessagingException {
-		//leo los mensajes
-		c.initStore();
-		c.initFolder();
 		Message[] m = this.c.leeCorreos();
 		for(int i=0; i<m.length-1; i++){
-			MensajeXML mensaje=c.toMensajeXML(m[i]);
+			MensajeXML mensaje=handler.toMensajeXML(m[i]);
 			mensaje.guardaMensaje();
 			System.out.println("Mensaje Guardado en mensajes.xml");
-			c.closeFolder();
-			c.closeStore();
-			
-			
 		}
-		//mensajesXML.add();
-		
 	}
 
 	public static void main(String args[]){
@@ -157,13 +129,7 @@ public class Botones extends JToolBar implements AnadeCorreo,AnadeMensaje, Actio
 		jf.add(toolbar, BorderLayout.NORTH);
 		jf.pack();
 		jf.setVisible(true);
-		
+
 	}
 
 }
-
-
-
-
- 
-

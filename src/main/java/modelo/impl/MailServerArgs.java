@@ -14,8 +14,8 @@ public class MailServerArgs {
                           String usuario,
                           String pwd) {
         this.h = host;
-        this.puertoSMTP = puertoSMTP == null ? DEFAULT_SMTP_PORT : puertoSMTP;
         this.he = he;
+        this.puertoSMTP = puertoSMTP == null ? DEFAULT_SMTP_PORT : puertoSMTP;
         this.puertoPOP = puertoPOP == null ? DEFAULT_POP_PORT : puertoPOP;
         this.de = de;
         this.usuario = usuario;

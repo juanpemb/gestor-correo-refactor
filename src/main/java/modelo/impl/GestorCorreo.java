@@ -1,12 +1,10 @@
 package modelo.impl;
 
 import com.sun.mail.smtp.SMTPSSLTransport;
+import modelo.Connector;
 import modelo.Correo;
 import utilidades.MensajeXML;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -15,166 +13,38 @@ import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Vector;
 
 public class GestorCorreo implements Correo {
 
+    private static final String TEXT_HTML = "text/html";
+    private static final String TEXT_PLAIN = "text/plain";
+    public static final String MAIL_SMTP_HOST = "mail.smtp.host";
+    public static final String FWD = "Fwd:";
+
+    private Connector connector;
     private MailServerArgs mailServerArgs;
-    private Session sesion;
-    private Store store;
-    private Folder folder;
+    private MessageHandler messageHandler;
 
     public GestorCorreo(MailServerArgs mailServerArgs) {
+
         this.mailServerArgs = mailServerArgs;
     }
 
-    public Session getSesion() {
-        return sesion;
-    }
 
-    public void setSession(Session sesion) {
-        this.sesion = sesion;
-    }
+    public void setConnector(Connector connector) {
 
-    public Store getStore() {
-        return store;
-    }
-
-    public void setStore(Store store) {
-        this.store = store;
+        this.connector = connector;
+        this.messageHandler = new MessageHandler(connector.getSession());
     }
 
 
-    public void initStore() {
-        Properties p = System.getProperties();
-        p.put("mail.smtp.host", mailServerArgs.getHost());
-        p.put("mail.smtp.auth", "true");
-        sesion = Session.getDefaultInstance(p, null);
-        try {
-            store = sesion.getStore("pop3");
-            store.connect(mailServerArgs.getHe(), mailServerArgs.getUsuario(), mailServerArgs.getPwd());
-        } catch (javax.mail.MessagingException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void initFolder() {
-        try {
-            if (!store.isConnected()) {
-                System.out.println("El store no esta conectado, porfavor hable con el administrador");
-                return;
-            }
-            store.isConnected();
-            folder = store.getFolder("INBOX");
-            folder.open(Folder.READ_WRITE);
-            if (folder.isOpen()) System.out.println("Folder abierto");
-
-        } catch (javax.mail.MessagingException e) {
-            System.err.println("error en initFolder");
-            e.printStackTrace();
-        }
-    }
-
-    public void closeStore() {
-        try {
-            store.close();
-        } catch (javax.mail.MessagingException e) {
-            System.err.println("error en closeStore");
-            e.printStackTrace();
-        }
-
-    }
-
-    public void closeFolder() {
-        try {
-            folder.close(true);
-        } catch (javax.mail.MessagingException e) {
-            System.err.println("error en closeFolder");
-            e.printStackTrace();
-        }
-    }
-
-    public Message creaMensaje(String to, String asunto, String texto) {
-        MimeMessage m = new MimeMessage(sesion);
-
-        try {
-            m.setFrom();
-            m.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-
-            m.setSubject(asunto);
-            MimeMultipart mmp = new MimeMultipart();
-            BodyPart bp = new MimeBodyPart();
-            bp.setContent(texto, "text/plain");
-            mmp.addBodyPart(bp);
-            m.setContent(mmp);
-            Flags fs = m.getFlags();
-
-            System.out.println("Numero de baderas soportadas: " + fs.getSystemFlags().length);
-
-        } catch (Exception e) {
-            System.err.println("en creaMensaje\n");
-            System.out.println("Gestor Correo :CreaMensaje: " + e.getMessage());
-        }
-        return m;
-
-
-    }
-
-    public Message incluirHTML(Message msj, String texto) {
-        try {
-            Multipart mp = (Multipart) msj.getContent();
-            BodyPart p = new MimeBodyPart();
-            p.setContent(texto, "text/html");
-
-            mp.addBodyPart(p);
-
-            Message m = new MimeMessage(sesion);
-            m.setFrom(msj.getFrom()[0]);
-            m.setSubject(msj.getSubject());
-
-            m.addRecipients(Message.RecipientType.TO, msj.getRecipients(Message.RecipientType.TO));
-
-            m.setContent(mp);
-
-            return m;
-        } catch (Exception e) {
-            System.err.println("Error en incluir HTML\n");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public Message creaMensajeHTML(String to, String asunto, String texto) {
-        MimeMessage m = new MimeMessage(sesion);
-        try {
-            m.setFrom(new InternetAddress(mailServerArgs.getDe()));
-            m.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            m.setSubject(asunto);
-            BodyPart bp = new MimeBodyPart();
-            bp.setContent(texto, "text/html");
-            MimeMultipart mmp = new MimeMultipart();
-            mmp.addBodyPart(bp);
-
-            m.setContent(mmp);
-            return m;
-
-        } catch (Exception e) {
-            System.out.println("error en crea mensajeHTML");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    public void mandaMensaje(Message m)
-    {
+    public void mandaMensaje(Message m) {
         if (m == null)
             throw new RuntimeException("Mensaje no valido" + m.toString());
 
         try {
-            Transport transport = sesion.getTransport("smtp");
+            Transport transport = connector.getTransport("smtp");
             transport.connect(
                     mailServerArgs.getHost(),
                     Integer.parseInt(mailServerArgs.getPuertoSMTP()),
@@ -184,20 +54,23 @@ public class GestorCorreo implements Correo {
             transport.close();
 
         } catch (javax.mail.MessagingException e) {
-            throw new RuntimeException("Error en el envio del mensaje " + m.toString() ,e);
+            throw new RuntimeException("Error en el envio del mensaje " + m.toString(), e);
         }
     }
 
     public void mandaMensajeSSL(Message m) {
         try {
-            SMTPSSLTransport t = new SMTPSSLTransport(sesion, new URLName(mailServerArgs.getHost()));
-            t.connect(mailServerArgs.getHost(),
-                    mailServerArgs.getUsuario(),
-                    mailServerArgs.getPwd()
-            );
+            SMTPSSLTransport transport = new SMTPSSLTransport(
+                    connector.getSession(),
+                    new URLName(mailServerArgs.getHost()));
 
-            t.sendMessage(m, m.getAllRecipients());
-            t.close();
+            transport.connect(mailServerArgs.getHost(),
+                    mailServerArgs.getUsuario(),
+                    mailServerArgs.getPwd());
+
+            transport.sendMessage(m, m.getAllRecipients());
+            transport.close();
+
         } catch (MessagingException e) {
             System.err.println("Error en mandaMensajeSSL");
             e.printStackTrace();
@@ -205,182 +78,24 @@ public class GestorCorreo implements Correo {
     }
 
     public Message[] leeCorreos() {
-        Properties p = System.getProperties();
-        p.put("mail.smtp.host", mailServerArgs.getHost());
-        Session sesion = Session.getDefaultInstance(p, null);
         try {
-
-            if (folder.isOpen()) System.out.println("La carpeta esta abierta");
-
-            Message[] m = folder.getMessages();
-            Message[] respuestaAuxiliar = new Message[m.length];
-            Message[] respuesta;
-            int longitud = 0;
-            for (int i = 0; i < m.length; i++) {
-                System.out.println("Bandera Deleted puesta en true");
-                m[i].setFlag(Flags.Flag.DELETED, true);
-                respuestaAuxiliar[i] = m[i];
-                longitud++;
+            Message[] messages = connector.getFolder().getMessages();
+            for (Message message: messages) {
+                message.setFlag(Flags.Flag.DELETED, true);
             }
-
-            respuesta = new Message[longitud];
-
-            for (int i = 0; i < longitud; i++) {
-                respuesta[i] = respuestaAuxiliar[i];
-            }
-            System.out.println("lectura de " + m.length + " Correos");
-            return m;
+            return messages;
 
         } catch (javax.mail.MessagingException e) {
-            System.err.println("Error al leer correo");
-            e.printStackTrace();
-            System.err.println("Error al leer correo");
-            return null;
+            throw new RuntimeException("error reading messages");
         }
 
     }
 
-    public Message incluirImagen(Message msj, String imagen) {
-        try {
-            Message mensaje = new MimeMessage(sesion);
-
-            mensaje.setSubject(msj.getSubject());
-            mensaje.setFrom((msj.getFrom()[0]));
-            mensaje.addRecipients(Message.RecipientType.TO,
-                    msj.getRecipients(Message.RecipientType.TO)
-            );
-
-            BodyPart bp = new MimeBodyPart();
-
-            String htmlText = "<h1>imagen</h1>" + "<img src=cid:\"" + imagen + "\">";    //la imagen es incluida c0mo hipertexto
-            bp.setContent(htmlText, "text/html");
-
-            MimeMultipart mp = (MimeMultipart) msj.getContent();
-            mp.addBodyPart(bp);
-
-            bp = new MimeBodyPart();
-
-            DataSource fds = new FileDataSource(imagen);
-            bp.setDataHandler(new DataHandler(fds));
-            bp.setHeader("Content-ID", "memememe");
-
-            mp.addBodyPart(bp);
-            mensaje.setContent(mp);
-
-            return mensaje;
-
-        } catch (Exception e) {
-            System.out.println("error en incluye imagen");
-            e.printStackTrace();
-            return null;
-        }
+    @Override
+    public void setSesion(Session session) {
+        this.connector.setSession(session);
     }
 
-    public Message incluirArchivo(Message m, String filename) {
-        try {
-            Message resultado = new MimeMessage(sesion);
-            resultado.setSubject("Fwd: " + m.getSubject());
-            resultado.addRecipient(Message.RecipientType.TO, m.getAllRecipients()[0]);
-
-            BodyPart mbp = new MimeBodyPart();
-
-            Multipart mp = new MimeMultipart();
-
-            mbp.setDataHandler(m.getDataHandler());
-            mp.addBodyPart(mbp);
-
-            mbp = new MimeBodyPart();
-            DataSource source = new FileDataSource(filename);
-            mbp.setDataHandler(new DataHandler(source));
-            mbp.setFileName(filename);
-            mp.addBodyPart(mbp);
-
-
-            resultado.setContent(mp);
-
-            return resultado;
-        } catch (MessagingException me) {
-            System.err.println("Error en incluirArchivo ");
-            me.printStackTrace();
-            return null;
-        }
-
-    }
-
-    public void recogeArchivo(Message m) {
-        try {
-            Multipart mp = (Multipart) m.getContent();
-            for (int i = 0, n = mp.getCount(); i < n; i++) {
-                Part p = mp.getBodyPart(i);
-                String disposition = p.getDisposition();
-                if ((disposition != null) && (disposition.equals(Part.ATTACHMENT)) || (disposition.equals(Part.INLINE))) {
-                    System.out.println("estoy en recoge archivo\nllamo a saveFile");
-                    saveFile(p.getFileName(), p.getInputStream());
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error en recoge archivo");
-            e.printStackTrace();
-        }
-    }
-
-    public MensajeXML toMensajeXML(Message m) throws MessagingException {
-        MensajeXML mensaje;
-        InternetAddress origenA[] = (InternetAddress[]) m.getFrom();
-        InternetAddress destinoA[] = (InternetAddress[]) m.getRecipients(Message.RecipientType.TO);
-        String origen = origenA[0].getAddress(), destino = destinoA[0].getAddress(), asunto = m.getSubject(), tipo, texto = leeCorreo(m), adjunto;
-
-        if (getAdjuntos(m)[0] != null) {
-            adjunto = getAdjuntos(m)[0];
-            mensaje = new MensajeXML(origen, destino, MensajeXML.ENTRADA, asunto, "Leido", texto, new Date().toString(), new File(adjunto));
-        } else {
-            mensaje = new MensajeXML(origen, destino, MensajeXML.ENTRADA, asunto, "Leido", texto, new Date().toString());
-        }
-
-        return mensaje;
-    }
-
-    public String leeCorreo(Message m) {
-        try {
-            String resultado = "";    //esta es la cadena en l que se pondra el mensaje de texto o html
-            Multipart mp = (Multipart) m.getContent();
-
-            for (int i = 0, n = mp.getCount(); i < n; i++) {
-                Part p = mp.getBodyPart(i);
-                String disposition = p.getDisposition();
-
-                if (disposition == null) {
-                    if (p.isMimeType("text/plain")) {
-                        resultado = resultado + (String) p.getContent();
-                    } else if (p.isMimeType("text/html")) {
-                        resultado = resultado + p.getContent();
-
-                        System.out.println("es texto html");
-                    } else {
-                        System.out.println("No es texto plano ni html");
-                    }
-                } else if ((disposition != null) && (disposition.equals(Part.ATTACHMENT)) || (disposition.equals(Part.INLINE))) //es un atachement
-                {
-                    System.out.println("Es un atachament\n");
-
-
-                    saveFile(p.getFileName(), p.getInputStream());
-                }
-            }
-            System.out.println("Mensaje recibido\n" + resultado);
-
-            return resultado;
-        } catch (MessagingException me) {
-            System.err.println("Error en leeCorreo\n");
-            me.printStackTrace();
-            return null;
-        } catch (IOException ioe) {
-            System.err.println("Error en leeCorreo\n ");
-            ioe.printStackTrace();
-            return null;
-        }
-
-    }
 
     public String[] getAdjuntos(Message m) {
         try {
@@ -396,49 +111,17 @@ public class GestorCorreo implements Correo {
                     j++;
                 }
             }
-
             resultado = new String[j + 1];
             int i = 0;
             while (i < j) {
                 resultado[i] = (String) lista.get(i);
                 i++;
             }
-
             return resultado;
-
         } catch (Exception e) {
             System.out.println("GestorCorreo: getAdjuntos: " + e.getMessage());
             return null;
         }
-
-    }
-
-    protected void saveFile(String filename, InputStream is) throws IOException {
-        if (filename == null || is == null) {
-            System.err.println("No guarda el adjunto");
-            return;
-        }
-        String name, ext;
-        name = getName(filename);
-        ext = getExtension(filename);
-
-        File f = new File(filename);
-        for (int i = 0; f.exists(); i++) {
-            f = new File(name + i + '.' + ext);
-        }
-
-        FileOutputStream fos = new FileOutputStream(f);
-
-        int c;
-        while ((c = is.read()) != -1) {
-            fos.write(c);
-            fos.flush();
-
-        }
-
-        is.close();
-        fos.close();
-
 
     }
 
@@ -449,7 +132,7 @@ public class GestorCorreo implements Correo {
             a[0] = new InternetAddress(para);
             respuesta.setReplyTo(a);
             respuesta.setText(texto);
-            Transport t = sesion.getTransport("smtp");
+            Transport t = connector.getSession().getTransport("smtp");
             t.connect(
                     mailServerArgs.getHost(),
                     mailServerArgs.getUsuario(),
@@ -460,17 +143,15 @@ public class GestorCorreo implements Correo {
         } catch (MessagingException e) {
             System.out.println("Error en responderMensajes\n");
             e.printStackTrace();
-
         }
-
 
     }
 
     public void reenviarMensaje(Message m, String para) {
         try {
-            MimeMessage enviar = new MimeMessage(sesion);
+            MimeMessage enviar = new MimeMessage(connector.getSession());
 
-            enviar.setSubject("Fwd: " + m.getSubject());
+            enviar.setSubject(FWD + " " + m.getSubject());
             enviar.setFrom(new InternetAddress(mailServerArgs.getDe()));
             enviar.addRecipient(Message.RecipientType.TO, new InternetAddress(para));
 
@@ -488,7 +169,7 @@ public class GestorCorreo implements Correo {
 
             enviar.setContent(mp);
 
-            Transport t = sesion.getTransport("smtp");
+            Transport t = connector.getTransport("smtp");
             t.connect(mailServerArgs.getHost(),
                     mailServerArgs.getUsuario(),
                     mailServerArgs.getPwd()
@@ -534,56 +215,47 @@ public class GestorCorreo implements Correo {
         }
     }
 
-
     public void borrarMensaje(int i) {
         try {
-            Message m = folder.getMessage(i);
+            Message m = connector.getFolder().getMessage(i);
             m.setFlag(Flags.Flag.DELETED, true);
         } catch (javax.mail.MessagingException e) {
             System.out.println("Error en borrarMensaje");
             e.printStackTrace();
         }
 
-
     }
 
-    private String getName(String f) {
-        if (f == null)
-            return "";
+    public Message creaMensaje(String to, String asunto, String texto) {
+        MimeMessage m = new MimeMessage(connector.getSession());
 
-        String aux = f;
-        String nombre = null;
-        int i = aux.lastIndexOf('.');
+        try {
+            m.setFrom();
+            m.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
 
-        if (i > 0 && i < aux.length() - 1) {
-            nombre = aux.substring(0, i);
+            m.setSubject(asunto);
+            MimeMultipart mmp = new MimeMultipart();
+            BodyPart bp = new MimeBodyPart();
+            bp.setContent(texto, TEXT_PLAIN);
+            mmp.addBodyPart(bp);
+            m.setContent(mmp);
+            Flags fs = m.getFlags();
+        } catch (Exception e) {
+            System.err.println("en creaMensaje\n");
+            System.out.println("Gestor Correo :CreaMensaje: " + e.getMessage());
         }
-        return nombre;
-    }
-
-    private String getExtension(String f) {
-        if (f == null)
-            return "";
-        String ext = null;
-        String s = f;
-        int i = s.lastIndexOf('.');
-
-        if (i > 0 && i < s.length() - 1) {
-            ext = s.substring(i + 1).toLowerCase();
-        }
-        return ext;
+        return m;
     }
 
 
     public static void main(String args[]) throws Exception {
         System.out.println("Prueba de gestion de correo\n");
-        //	GestionCorreo gc=new GestionCorreo("mailhost.terra.es","pop3.terra.es","chiclemb@terra.es","chiclemb.terra.es","292829");
-        //GestorCorreo gc = new GestorCorreo("127.0.0.1", "127.0.0.1", "juanpe1..localhost", "juanpe1..localhost", "111");
-        MailServerArgs session = new MailServerArgs("127.0.0.1",null, "127.0.0.1", null, "juanpe1..localhost", "juanpe1..localhost", "111");
+        MailServerArgs session = new MailServerArgs("127.0.0.1", null, "127.0.0.1", null, "juanpe1..localhost", "juanpe1..localhost", "111");
         GestorCorreo gc = new GestorCorreo(session);
+        MailServerConnector conector = new MailServerConnector();
+        conector.initStore(session.getHost(), session.getHe(), session.getUsuario(), session.getPwd());
+        conector.initFolder();
 
-        gc.initStore();
-        gc.initFolder();
         gc.mandaMensaje(gc.creaMensaje("juanpe1@localhost", "pruebas del GC", "Mensaje desde el gestor de correo"));
         System.out.println("Envio el mensaje");
 
@@ -594,10 +266,6 @@ public class GestorCorreo implements Correo {
 
         MensajeXML mensajeXML = new MensajeXML("juanpe1..localhost", "juanpemb@gmail.com", -1, "Prueba del metodo enviaMensaje(XML)", "trabajo", "texto enviado ", new Date().toString());
         gc.leeCorreos();
-
-        gc.closeFolder();
-        gc.closeStore();
-
     }
 
 }

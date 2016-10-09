@@ -9,20 +9,17 @@ package vista;
 import modelo.Correo;
 import modelo.impl.GestorCorreo;
 import modelo.impl.MailServerArgs;
+import modelo.impl.MessageHandler;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import java.io.DataInputStream;
 import java.io.IOException;
-/**
- * @author juanpedro
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 public class InterpreteComados {
-	
-	Correo correo;
+
+	private MessageHandler handler = new MessageHandler();
+	private Correo correo;
 	
 	public InterpreteComados(String smtp,String pop, String usuario, String password){
 		MailServerArgs mss = new MailServerArgs(smtp,null,pop,null,usuario,usuario,password);
@@ -35,26 +32,18 @@ public class InterpreteComados {
 	
 		String resultado="";
 		String linea="----------------------------------------------";
-		correo.initStore();
-		correo.initFolder();
 		Message[] mensajes=correo.leeCorreos();
 		for (int i=0; i<mensajes.length;i++){
-			resultado=resultado+"\n\n"+linea+"\n"+mensajes[i].getSentDate().toGMTString()+"\n"+correo.leeCorreo(mensajes[i]);
+			resultado=resultado+"\n\n"+linea+"\n"+mensajes[i].getSentDate().toGMTString()+"\n"+handler.leeCorreo(mensajes[i]);
 		}
-		correo.closeFolder();
-		correo.closeStore();
-	
+
 		return resultado;
 		
 	}
 	
 	public void enviar(String para,String asunto, String texto ){
 		if(correo!=null){						
-			correo.initStore();
-			correo.initFolder();
 			correo.mandaMensaje(correo.creaMensaje(para,asunto,texto));
-			correo.closeFolder();
-			correo.closeStore();
 		}
 		
 	}
@@ -99,8 +88,5 @@ public class InterpreteComados {
 				interprete.enviar(from,asunto,texto);
 			}
 		}
-		
-		
 	}
-	
 }
